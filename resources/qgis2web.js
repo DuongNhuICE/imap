@@ -44,7 +44,7 @@ var searchLayer = new SearchLayer({
 map.addControl(searchLayer);
 document
     .getElementsByClassName('search-layer')[0]
-    .getElementsByTagName('button')[0].className += ' fa fa-binoculars';
+    .getElementsByTagName('button')[0].className += 'fa fa-search';
 
 map.getView().fit(
     [11835447.077932, 2311240.046734, 11980879.367584, 2412505.809271],
