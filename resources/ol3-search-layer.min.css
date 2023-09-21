@@ -13,13 +13,18 @@
 }
 .search-layer-input-search {
     position: absolute;
-    top: 2px;
+    top: -5px;
     left: 32px;
-    width: 180px;
-    padding: 5px;
+    width: 250px;
+    height: 35px;
+    padding-left: 10px;
     border: 1px solid #ccc;
     font-family: inherit;
-    font-size: 0.875rem;
+    font-size: 14px;
+    border-radius: 5px;
+}
+.search-layer-input-search:focus-visible {
+    outline: none;
 }
 .search-layer-collapsed {
     display: none;
