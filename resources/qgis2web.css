@@ -19,6 +19,7 @@ td {
 }
 
 .ol-popup {
+    /*
     display: none;
     position: fixed;
     background-color: white;
@@ -35,6 +36,19 @@ td {
     min-width: 200px;
     max-height: 600px;
     overflow: auto;
+    */
+    position: fixed;
+    top: 100px; /* Đặt vị trí đứng theo pixel từ phía trên cùng của trình duyệt */
+    left: 50%; /* Đặt vị trí ngang theo giữa màn hình */
+    transform: translateX(-50%); /* Dịch chuyển popup điều chỉnh vị trí ngang giữa */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    z-index: 9999; /* Chọn một giá trị z-index đủ lớn để đảm bảo popup luôn hiển thị trên cùng */
+    display: none; /* Ẩn popup ban đầu */
+    max-height: 400px; /* Đặt chiều cao tối đa cho popup */
+    overflow-y: auto; /* Thêm thanh cuộn nếu nội dung vượt quá chiều cao tối đa */
 }
 
 .ol-popup-closer {
@@ -56,8 +70,8 @@ td {
 }
 
 .layer-switcher .panel {
-    /* //border: 4px solid rgba(0, 60, 136, 0.5) !important;
-    //border-radius: 4px !important; */
+    border: 4px solid rgba(0, 60, 136, 0.5) !important;
+    border-radius: 4px !important; 
 }
 
 .layer-switcher {
@@ -78,3 +92,5 @@ td {
 #popup-content li {
     margin-bottom: 0.25em;
 }
+/* Bảng thông tin*/
+

@@ -1,26 +1,50 @@
 .search-layer {
-    top: 65px;
-    left: 0.5em;
+    position: absolute;
+    top: 10px; /* Điều chỉnh vị trí đứng theo pixel từ phía trên cùng của bản đồ */
+    left: 10px; /* Điều chỉnh vị trí ngang theo pixel từ phía trái của bản đồ */
+    z-index: 1000; /* Chọn giá trị z-index đủ lớn để đảm bảo ô tìm kiếm luôn hiển thị trên cùng */
+    
 }
 .ol-touch .search-layer {
     top: 80px;
 }
 .search-layer button {
-    background-repeat: no-repeat;
+    /*background-repeat: no-repeat;
     background-position: center center;
     top: 5px;
     left: 5px;
+    */
+    display: none; /* Ẩn nút tìm kiếm */
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    padding: 10px 15px;
+    cursor: pointer;
+
 }
 .search-layer-input-search {
-    position: absolute;
+    display: inline-block; /* Hiển thị ô nhập tìm kiếm trên cùng một hàng */
+    /*position: absolute;
     top: 2px;
     left: 32px;
     width: 180px;
     padding: 5px;
     border: 1px solid #ccc;
     font-family: inherit;
-    font-size: 0.875rem;
+    font-size: 0.875rem; */
+    width: 300px; /* Đổi chiều rộng của ô nhập tìm kiếm */
+    height: 40px;
+    font-size: 1rem; /* Đổi kích thước chữ */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    outline: none;
 }
 .search-layer-collapsed {
-    display: none;
+    display: flex; /* Đổi kiểu hiển thị sang flex */
+    justify-content: flex-end; /* Đặt nút tìm kiếm ở cùng bên phải */
+    align-items: center; /* Căn giữa theo chiều dọc */
 }
+
+

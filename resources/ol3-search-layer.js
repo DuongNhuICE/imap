@@ -74,7 +74,7 @@ var SearchLayer = (function (Control) {
             defaultInputClass.push('search-layer-collapsed');
         }
         input.setAttribute('class', defaultInputClass.join(' '));
-        input.setAttribute('placeholder', 'Search ...');
+        input.setAttribute('placeholder', 'Bạn muốn tra cứu thông tin gì ...');
         input.setAttribute('type', 'text');
 
         form.appendChild(input);
@@ -90,10 +90,20 @@ var SearchLayer = (function (Control) {
             target: options.target,
         });
 
+        var selectedStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'red', // Màu viền của đối tượng đã chọn
+                width: 2 // Độ rộng của viền
+            }),
+            fill: new ol.style.Fill({
+                color: 'transparent' // Màu nền của đối tượng đã chọn
+            })
+        });
         select = new ol.interaction.Select({
             id: options.selectId || 'defaultSearchLayer',
             layers: [options.layer],
             condition: ol.events.condition.never,
+            style: selectedStyle // Gán style cho các đối tượng đã chọn
         });
 
         var map = options.map;
@@ -129,17 +139,20 @@ var SearchLayer = (function (Control) {
                 predictNextSearch: function (info) {
                     var feat = source.getFeatureById(info.selection.value);
                     var featType = feat.getGeometry().getType();
+                     // Đặt tọa độ trung tâm của map view bằng tọa độ của đối tượng
+                    var center = feat.getGeometry().getCoordinates();       
                     if (typesToZoomToCenterAndZoom.indexOf(featType) !== -1) {
                         var newCenter = ol.extent.getCenter(
                             feat.getGeometry().getExtent(),
                         );
                         map.getView().setCenter(newCenter);
-                        map.getView().setZoom(options.zoom || 12);
-                    } else if (typesToZoomToExtent.indexOf(featType) !== -1) {
-                        map.getView().fit(
-                            feat.getGeometry().getExtent(),
-                            map.getSize(),
-                        );
+                        map.getView().setZoom(parseInt(options.zoom )|| 12); // chỉnh sửa mức zoom 
+                    } else if (typesToZoomToExtent.indexOf(featType) !== -1) 
+                    {
+                        var extent = feat.getGeometry().getExtent();
+                        var size = map.getSize();
+                        var newExtent = ol.extent.buffer(extent, 300); // Tăng kích thước phạm vi
+                        map.getView().fit(newExtent, size);
                     }
 
                     select.getFeatures().clear();
@@ -167,3 +180,5 @@ var SearchLayer = (function (Control) {
     SearchLayer.prototype.constructor = SearchLayer;
     return SearchLayer;
 })(ol.control.Control);
+
+

@@ -36,7 +36,7 @@ map.addControl(layerSwitcher);
 var searchLayer = new SearchLayer({
     layer: lyr_CMB_CangHaiPhong_BenCang_7,
     colName: 'ten',
-    zoom: 10,
+    zoom: 5,
     collapsed: true,
     map: map,
 });
@@ -44,7 +44,7 @@ var searchLayer = new SearchLayer({
 map.addControl(searchLayer);
 document
     .getElementsByClassName('search-layer')[0]
-    .getElementsByTagName('button')[0].className += ' fa fa-binoculars';
+    .getElementsByTagName('button')[0].className += ' fa fa-binoculars';// Kiểu style nút tìm kiếm
 
 map.getView().fit(
     [11835447.077932, 2311240.046734, 11980879.367584, 2412505.809271],
@@ -53,6 +53,8 @@ map.getView().fit(
 
 var NO_POPUP = 0;
 var ALL_FIELDS = 1;
+
+
 
 /**
  * Returns either NO_POPUP, ALL_FIELDS or the name of a single field to use for
@@ -79,11 +81,11 @@ var featureOverlay = new ol.layer.Vector({
     style: [
         new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: '#f00',
-                width: 1,
+                color: '#ffff00',
+                width: 4,
             }),
             fill: new ol.style.Fill({
-                color: 'rgba(255,0,0,0.1)',
+                color: 'transparent',
             }),
         }),
     ],
@@ -98,7 +100,7 @@ var highlight;
 var autolinker = new Autolinker({
     truncate: { length: 30, location: 'smart' },
 });
-var onPointerMove = function (evt) {
+var onSingleClick = function (evt) {
     if (!doHover && !doHighlight) {
         return;
     }
@@ -269,6 +271,7 @@ var onPointerMove = function (evt) {
                 featureOverlay.getSource().removeFeature(highlight);
             }
             if (currentFeature) {
+                // Tạo một hiệu ứng thay đổi màu sắc khi di chuột vào đối tượng
                 var styleDefinition = currentLayer.getStyle().toString();
 
                 if (currentFeature.getGeometry().getType() == 'Point') {
@@ -279,7 +282,11 @@ var onPointerMove = function (evt) {
                     highlightStyle = new ol.style.Style({
                         image: new ol.style.Circle({
                             fill: new ol.style.Fill({
-                                color: '#ffff00',
+                                color: 'transparent', // Đổi màu sắc tại đây
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: '#ffff00', // Màu viền
+                                width: 2, // Độ rộng của viền
                             }),
                             radius: radius,
                         }),
@@ -294,7 +301,7 @@ var onPointerMove = function (evt) {
 
                     highlightStyle = new ol.style.Style({
                         stroke: new ol.style.Stroke({
-                            color: '#ffff00',
+                            color: 'transparent', // Đổi màu sắc tại đây
                             lineDash: null,
                             width: featureWidth,
                         }),
@@ -302,7 +309,11 @@ var onPointerMove = function (evt) {
                 } else {
                     highlightStyle = new ol.style.Style({
                         fill: new ol.style.Fill({
-                            color: '#ffff00',
+                            color: 'transparent', // Đổi màu sắc tại đây
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#ffff00', // Màu viền
+                            width: 2, // Độ rộng của viền
                         }),
                     });
                 }
@@ -312,7 +323,8 @@ var onPointerMove = function (evt) {
             highlight = currentFeature;
         }
     }
-
+    /*
+    //Hiện Popup khi hover chuột
     if (doHover) {
         if (popupText) {
             overlayPopup.setPosition(coord);
@@ -323,15 +335,11 @@ var onPointerMove = function (evt) {
             closer.blur();
         }
     }
+    */
 };
 
 var onSingleClick = function (evt) {
-    if (doHover) {
-        return;
-    }
-    if (sketch) {
-        return;
-    }
+   
     var pixel = map.getEventPixel(evt.originalEvent);
     var coord = evt.coordinate;
     var popupField;
@@ -340,93 +348,27 @@ var onSingleClick = function (evt) {
     var clusteredFeatures;
     var popupText = '<ul>';
     map.forEachFeatureAtPixel(pixel, function (feature, layer) {
-        if (
-            feature instanceof ol.Feature &&
-            (layer.get('interactive') || layer.get('interactive') == undefined)
-        ) {
-            var doPopup = false;
-            for (k in layer.get('fieldImages')) {
-                if (layer.get('fieldImages')[k] != 'Hidden') {
-                    doPopup = true;
-                }
+         // We only care about features from layers in the layersList, ignore
+        // any other layers which the map might contain such as the vector
+        // layer used by the measure tool
+        if (layersList.indexOf(layer) === -1) {
+            return;
+        }
+        var doPopup = false;
+        for (k in layer.get('fieldImages')) {
+            if (layer.get('fieldImages')[k] != 'Hidden') {
+                doPopup = true;
             }
-            currentFeature = feature;
-            clusteredFeatures = feature.get('features');
-            var clusterFeature;
-            if (typeof clusteredFeatures !== 'undefined') {
-                if (doPopup) {
-                    for (var n = 0; n < clusteredFeatures.length; n++) {
-                        clusterFeature = clusteredFeatures[n];
-                        currentFeatureKeys = clusterFeature.getKeys();
-                        popupText += '<li><table>';
-                        for (var i = 0; i < currentFeatureKeys.length; i++) {
-                            if (currentFeatureKeys[i] != 'geometry') {
-                                popupField = '';
-                                if (
-                                    layer.get('fieldLabels')[
-                                        currentFeatureKeys[i]
-                                    ] == 'inline label'
-                                ) {
-                                    popupField +=
-                                        '<th>' +
-                                        layer.get('fieldAliases')[
-                                            currentFeatureKeys[i]
-                                        ] +
-                                        ':</th><td>';
-                                } else {
-                                    popupField += '<td colspan="2">';
-                                }
-                                if (
-                                    layer.get('fieldLabels')[
-                                        currentFeatureKeys[i]
-                                    ] == 'header label'
-                                ) {
-                                    popupField +=
-                                        '<strong>' +
-                                        layer.get('fieldAliases')[
-                                            currentFeatureKeys[i]
-                                        ] +
-                                        ':</strong><br />';
-                                }
-                                if (
-                                    layer.get('fieldImages')[
-                                        currentFeatureKeys[i]
-                                    ] != 'ExternalResource'
-                                ) {
-                                    popupField +=
-                                        clusterFeature.get(
-                                            currentFeatureKeys[i],
-                                        ) != null
-                                            ? autolinker.link(
-                                                  clusterFeature
-                                                      .get(
-                                                          currentFeatureKeys[i],
-                                                      )
-                                                      .toLocaleString(),
-                                              ) + '</td>'
-                                            : '';
-                                } else {
-                                    popupField +=
-                                        clusterFeature.get(
-                                            currentFeatureKeys[i],
-                                        ) != null
-                                            ? '<img src="images/' +
-                                              clusterFeature
-                                                  .get(currentFeatureKeys[i])
-                                                  .replace(/[\\\/:]/g, '_')
-                                                  .trim() +
-                                              '" /></td>'
-                                            : '';
-                                }
-                                popupText += '<tr>' + popupField + '</tr>';
-                            }
-                        }
-                        popupText += '</table></li>';
-                    }
-                }
-            } else {
-                currentFeatureKeys = currentFeature.getKeys();
-                if (doPopup) {
+        }
+        currentFeature = feature;
+        currentLayer = layer;
+        clusteredFeatures = feature.get('features');
+        var clusterFeature;
+        if (typeof clusteredFeatures !== 'undefined') {
+            if (doPopup) {
+                for (var n = 0; n < clusteredFeatures.length; n++) {
+                    clusterFeature = clusteredFeatures[n];
+                    currentFeatureKeys = clusterFeature.getKeys();
                     popupText += '<li><table>';
                     for (var i = 0; i < currentFeatureKeys.length; i++) {
                         if (currentFeatureKeys[i] != 'geometry') {
@@ -463,20 +405,20 @@ var onSingleClick = function (evt) {
                                 ] != 'ExternalResource'
                             ) {
                                 popupField +=
-                                    currentFeature.get(currentFeatureKeys[i]) !=
+                                    clusterFeature.get(currentFeatureKeys[i]) !=
                                     null
                                         ? autolinker.link(
-                                              currentFeature
+                                              clusterFeature
                                                   .get(currentFeatureKeys[i])
                                                   .toLocaleString(),
                                           ) + '</td>'
                                         : '';
                             } else {
                                 popupField +=
-                                    currentFeature.get(currentFeatureKeys[i]) !=
+                                    clusterFeature.get(currentFeatureKeys[i]) !=
                                     null
                                         ? '<img src="images/' +
-                                          currentFeature
+                                          clusterFeature
                                               .get(currentFeatureKeys[i])
                                               .replace(/[\\\/:]/g, '_')
                                               .trim() +
@@ -486,8 +428,69 @@ var onSingleClick = function (evt) {
                             popupText += '<tr>' + popupField + '</tr>';
                         }
                     }
-                    popupText += '</table>';
+                    popupText += '</table></li>';
                 }
+            }
+        } else {
+            currentFeatureKeys = currentFeature.getKeys();
+            if (doPopup) {
+                popupText += '<li><table>';
+                for (var i = 0; i < currentFeatureKeys.length; i++) {
+                    if (currentFeatureKeys[i] != 'geometry') {
+                        popupField = '';
+                        if (
+                            layer.get('fieldLabels')[currentFeatureKeys[i]] ==
+                            'inline label'
+                        ) {
+                            popupField +=
+                                '<th>' +
+                                layer.get('fieldAliases')[
+                                    currentFeatureKeys[i]
+                                ] +
+                                ':</th><td>';
+                        } else {
+                            popupField += '<td colspan="2">';
+                        }
+                        if (
+                            layer.get('fieldLabels')[currentFeatureKeys[i]] ==
+                            'header label'
+                        ) {
+                            popupField +=
+                                '<strong>' +
+                                layer.get('fieldAliases')[
+                                    currentFeatureKeys[i]
+                                ] +
+                                ':</strong><br />';
+                        }
+                        if (
+                            layer.get('fieldImages')[currentFeatureKeys[i]] !=
+                            'ExternalResource'
+                        ) {
+                            popupField +=
+                                currentFeature.get(currentFeatureKeys[i]) !=
+                                null
+                                    ? autolinker.link(
+                                          currentFeature
+                                              .get(currentFeatureKeys[i])
+                                              .toLocaleString(),
+                                      ) + '</td>'
+                                    : '';
+                        } else {
+                            popupField +=
+                                currentFeature.get(currentFeatureKeys[i]) !=
+                                null
+                                    ? '<img src="images/' +
+                                      currentFeature
+                                          .get(currentFeatureKeys[i])
+                                          .replace(/[\\\/:]/g, '_')
+                                          .trim() +
+                                      '" /></td>'
+                                    : '';
+                        }
+                        popupText += '<tr>' + popupField + '</tr>';
+                    }
+                }
+                popupText += '</table></li>';
             }
         }
     });
@@ -497,68 +500,107 @@ var onSingleClick = function (evt) {
         popupText += '</ul>';
     }
 
-    var viewProjection = map.getView().getProjection();
-    var viewResolution = map.getView().getResolution();
-    for (i = 0; i < wms_layers.length; i++) {
-        if (wms_layers[i][1]) {
-            var url = wms_layers[i][0]
-                .getSource()
-                .getGetFeatureInfoUrl(
-                    evt.coordinate,
-                    viewResolution,
-                    viewProjection,
-                    {
-                        INFO_FORMAT: 'text/html',
-                    },
-                );
-            if (url) {
-                popupText =
-                    popupText +
-                    '<iframe style="width:100%;height:110px;border:0px;" id="iframe" seamless src="' +
-                    url +
-                    '"></iframe>';
+    if (doHighlight) {
+        if (currentFeature !== highlight) {
+            if (highlight) {
+                featureOverlay.getSource().removeFeature(highlight);
             }
+            if (currentFeature) {
+                // Tạo một hiệu ứng thay đổi màu sắc khi di chuột vào đối tượng
+                var styleDefinition = currentLayer.getStyle().toString();
+
+                if (currentFeature.getGeometry().getType() == 'Point') {
+                    var radius = styleDefinition
+                        .split('radius')[1]
+                        .split(' ')[1];
+
+                    highlightStyle = new ol.style.Style({
+                        image: new ol.style.Circle({
+                            fill: new ol.style.Fill({
+                                color: 'transparent', // Đổi màu sắc tại đây
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: '#ffff00', // Màu viền
+                                width: 2, // Độ rộng của viền
+                            }),
+                            radius: radius,
+                        }),
+                    });
+                } else if (
+                    currentFeature.getGeometry().getType() == 'LineString'
+                ) {
+                    var featureWidth = styleDefinition
+                        .split('width')[1]
+                        .split(' ')[1]
+                        .replace('})', '');
+
+                    highlightStyle = new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: 'transparent', // Đổi màu sắc tại đây
+                            lineDash: null,
+                            width: featureWidth,
+                        }),
+                    });
+                } else {
+                    highlightStyle = new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: 'transparent', // Đổi màu sắc tại đây
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#ffff00', // Màu viền
+                            width: 2, // Độ rộng của viền
+                        }),
+                    });
+                }
+                featureOverlay.getSource().addFeature(currentFeature);
+                featureOverlay.setStyle(highlightStyle);
+            }
+            highlight = currentFeature;
         }
     }
+    // Giả định dữ liệu từ popup
+    //var popupText = "Phân loại: ABC<br>Tên: XYZ<br>"; // Điều này là một ví dụ, thay thế bằng dữ liệu thực tế từ popup
 
+    // hiện PopUp
     if (popupText) {
         overlayPopup.setPosition(coord);
         content.innerHTML = popupText;
         container.style.display = 'block';
+        //console.log(popupText);
+        // Xóa tất cả các dòng hiện có trong bảng
+        var table = document.getElementById('info-table');
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+        
+        // Lấy thông tin từ popup và thêm vào bảng
+        table.innerHTML= popupText;
+        
     } else {
         container.style.display = 'none';
         closer.blur();
     }
+    
 };
 
-map.on('pointermove', function (evt) {
-    onPointerMove(evt);
-});
 map.on('singleclick', function (evt) {
     onSingleClick(evt);
 });
-
-var attributionComplete = false;
-map.on('rendercomplete', function (evt) {
-    if (!attributionComplete) {
-        var attribution = document.getElementsByClassName('ol-attribution')[0];
-        var attributionList = attribution.getElementsByTagName('ul')[0];
-        var firstLayerAttribution =
-            attributionList.getElementsByTagName('li')[0];
-        var qgis2webAttribution = document.createElement('li');
-        qgis2webAttribution.innerHTML =
-            '<a href="https://github.com/tomchadwin/qgis2web">qgis2web</a> &middot; ';
-        var olAttribution = document.createElement('li');
-        olAttribution.innerHTML =
-            '<a href="https://openlayers.org/">OpenLayers</a> &middot; ';
-        var qgisAttribution = document.createElement('li');
-        qgisAttribution.innerHTML = '<a href="https://qgis.org/">QGIS</a>';
-        attributionList.insertBefore(
-            qgis2webAttribution,
-            firstLayerAttribution,
-        );
-        attributionList.insertBefore(olAttribution, firstLayerAttribution);
-        attributionList.insertBefore(qgisAttribution, firstLayerAttribution);
-        attributionComplete = true;
-    }
+map.on('singleclick', function (evt) {
+    onClick(evt);
 });
+
+
+
+// Điều chỉnh vị trí của SearchLayer bằng JavaScript
+var searchLayer = document.querySelector('.search-layer');
+searchLayer.style.top = '0px'; // Đặt vị trí đứng
+searchLayer.style.left = '0px'; // Đặt vị trí ngang
+searchLayer.style.height = '40px';
+//
+
+
+
+
+
+
