@@ -62,12 +62,12 @@ var ALL_FIELDS = 1;
  * @param layerList {Array} List of ol.Layer instances
  * @param layer {ol.Layer} Layer to find field info about
  */
-function getPopupFields(layerList, layer) {
+function getPopupFields(layerList, layer) 
+{
     // Determine the index that the layer will have in the popupLayers Array,
     // if the layersList contains more items than popupLayers then we need to
     // adjust the index to take into account the base maps group
-    var idx =
-        layersList.indexOf(layer) - (layersList.length - popupLayers.length);
+    var idx =layersList.indexOf(layer) - (layersList.length - popupLayers.length);
     return popupLayers[idx];
 }
 
@@ -556,25 +556,20 @@ var onSingleClick = function (evt) {
                 featureOverlay.setStyle(highlightStyle);
             }
             highlight = currentFeature;
+
+
+            // đưa giá trị vào bảng
+            onSelectObjectFromSearch(currentFeature);
         }
     }
-    // Giả định dữ liệu từ popup
-    //var popupText = "Phân loại: ABC<br>Tên: XYZ<br>"; // Điều này là một ví dụ, thay thế bằng dữ liệu thực tế từ popup
-
+    
     // hiện PopUp
     if (popupText) {
         overlayPopup.setPosition(coord);
         content.innerHTML = popupText;
         container.style.display = 'block';
         //console.log(popupText);
-        // Xóa tất cả các dòng hiện có trong bảng
-        var table = document.getElementById('info-table');
-        while (table.rows.length > 1) {
-            table.deleteRow(1);
-        }
-        
-        // Lấy thông tin từ popup và thêm vào bảng
-        table.innerHTML= popupText;
+       
         
     } else {
         container.style.display = 'none';
