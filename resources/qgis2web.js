@@ -560,7 +560,8 @@ var onSingleClick = function (evt) {
     }
     // Giả định dữ liệu từ popup
     //var popupText = "Phân loại: ABC<br>Tên: XYZ<br>"; // Điều này là một ví dụ, thay thế bằng dữ liệu thực tế từ popup
-
+    // Loại bỏ dấu chấm (".") từ chuỗi HTML của popup
+   
     // hiện PopUp
     if (popupText) {
         overlayPopup.setPosition(coord);
@@ -574,7 +575,7 @@ var onSingleClick = function (evt) {
         }
         
         // Lấy thông tin từ popup và thêm vào bảng
-        table.innerHTML= popupText;
+        table.innerHTML = popupText;
         
     } else {
         container.style.display = 'none';
