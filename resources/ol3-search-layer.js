@@ -93,7 +93,7 @@ var SearchLayer = (function (Control) {
         var selectedStyle = new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: 'red', // Màu viền của đối tượng đã chọn
-                width: 2 // Độ rộng của viền
+                width: 4 // Độ rộng của viền
             }),
             fill: new ol.style.Fill({
                 color: 'transparent' // Màu nền của đối tượng đã chọn
@@ -130,6 +130,7 @@ var SearchLayer = (function (Control) {
                             return {
                                 text: el.get(options.colName),
                                 value: el.getId(), // If GeoJSON has an id
+                                feature: el, // Lưu tham chiếu đến đối tượng
                             };
                         }),
                     },
@@ -154,9 +155,13 @@ var SearchLayer = (function (Control) {
                         var newExtent = ol.extent.buffer(extent, 300); // Tăng kích thước phạm vi
                         map.getView().fit(newExtent, size);
                     }
+                    // Lấy thông tin đối tượng
+                    
+                    onSelectObjectFromSearch(info.selection.feature);
 
                     select.getFeatures().clear();
                     select.getFeatures().push(feat);
+                    
                 },
             });
         };
@@ -181,4 +186,32 @@ var SearchLayer = (function (Control) {
     return SearchLayer;
 })(ol.control.Control);
 
+// Hàm xử lý khi chọn đối tượng từ ô tìm kiếm và hiển thị thông tin trong bảng
+var onSelectObjectFromSearch = function (feature) {
+    // Lấy thông tin của đối tượng
+    var featureProperties = feature.getProperties();
+    // Xóa thuộc tính đầu tiên (nếu có)
+    var firstProperty = Object.keys(featureProperties)[0];
+    if (firstProperty) {
+        delete featureProperties[firstProperty];
+    }
 
+
+    // Lấy tham chiếu đến bảng
+    var table = document.getElementById('info-table');
+
+    // Xóa tất cả các dòng hiện có trong bảng, trừ dòng tiêu đề (nếu có)
+    while (table.rows.length > 1) {
+        table.deleteRow(1);
+    }
+
+    // Tạo một dòng mới cho mỗi thuộc tính của đối tượng và hiển thị nó trong bảng
+    for (var key in featureProperties) {
+        var value = featureProperties[key];
+        var row = table.insertRow();
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        cell1.innerHTML = key; // Tên thuộc tính
+        cell2.innerHTML = value; // Giá trị thuộc tính
+    }
+};

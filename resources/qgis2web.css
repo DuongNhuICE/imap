@@ -92,5 +92,78 @@ td {
 #popup-content li {
     margin-bottom: 0.25em;
 }
-/* Bảng thông tin*/
+/* Header */
+header {
+    background-color: #3498db; /* Chọn màu bạn muốn ở đây */
+    color: #0a21ee; /* Màu chữ trắng hoặc màu tương tự cho sự tương phản */
+    padding: 20px; /* Khoảng cách giữa nền và vị trí text */
+    height:  9%;
+}
 
+/* CSS để tùy chỉnh header và vị trí text khác (nếu cần) */
+h1 {
+    font-size: 28px; /* Kích thước chữ của vị trí text */
+    margin: 0; /* Loại bỏ khoảng cách ngoài của vị trí text */
+    position: fixed; /* Đặt header làm phần cố định */
+    top: 15px; /* Đặt header ở phía trên cùng */
+    left: 400px; /* Đặt header ở phía trái */
+    width: 100%; /* Đặt header chiếm toàn bộ chiều rộng */
+}
+
+nav {
+    margin-right: 10px;
+    position: fixed;
+    top: 40px;
+    left: 390px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+nav li {
+    margin-right: 10px;
+    position: relative; /* Tạo khoảng cách giữa các mục menu */
+}
+ /* CSS để tùy chỉnh màu chữ khi di chuột qua mục menu */
+ nav li:hover a {
+    color: #e74c3c; /* Màu chữ khi di chuột vào */
+}
+nav a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 20px;
+    display: block; /* Để mục menu trở thành hình chữ nhật */
+    padding: 10px 10px; /* Khoảng cách nội dung menu */
+}
+
+/* CSS để tùy chỉnh màu nền khi di chuột qua mục menu */
+nav li:hover {
+    background-color: transparent;
+    padding: 0px 0px; /* Chỉnh kích thước nền menu khi di chuột vào */
+}
+
+/* CSS để tạo hiệu ứng hiển thị menu ngang */
+nav ul {
+    position: relative;
+}
+
+nav ul::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px; /* Chiều cao của dòng ngang */
+    background-color: #fff; /* Màu của dòng ngang */
+    display: none;
+}
+
+/* CSS để thêm khoảng cách giữa header và nội dung chính */
+.content {
+    margin-top: 50px; /* Để tránh bị che phủ bởi menu */
+}
